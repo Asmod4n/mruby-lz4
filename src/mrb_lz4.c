@@ -49,7 +49,7 @@ mrb_mruby_lz4_gem_init(mrb_state* mrb) {
   struct RClass *LZ4_mod;
 
   LZ4_mod = mrb_define_module(mrb, "LZ4");
-  LZ4_err = mrb_define_class_under(mrb, LZ4_mod, "Error", E_RUNTIME_ERROR);
+  mrb_define_class_under(mrb, LZ4_mod, "Error", E_RUNTIME_ERROR);
   mrb_define_module_function(mrb, LZ4_mod, "compress_default", mrb_LZ4_compress_default, MRB_ARGS_REQ(1));
   mrb_define_module_function(mrb, LZ4_mod, "decompress_safe", mrb_LZ4_decompress_safe, MRB_ARGS_REQ(2));
 }
