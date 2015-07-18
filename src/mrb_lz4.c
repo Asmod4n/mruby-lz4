@@ -1,6 +1,16 @@
-#include "mruby/lz4.h"
+﻿#include "mruby/lz4.h"
 #include "lz4.h"
 #include <mruby/string.h>
+
+/* LZ4_GCC_VERSION is defined into lz4.h */
+#if (LZ4_GCC_VERSION >= 302) || (__INTEL_COMPILER >= 800) || defined(__clang__)
+#  define expect(expr,value)    (__builtin_expect ((expr),(value)) )
+#else
+#  define expect(expr,value)    (expr)
+#endif
+
+#define likely(expr)     expect((expr) != 0, 1)
+#define unlikely(expr)   expect((expr) != 0, 0)
 
 static mrb_value
 mrb_LZ4_compress_default(mrb_state *mrb, mrb_value self)
@@ -11,10 +21,10 @@ mrb_LZ4_compress_default(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "s", &source, &source_size);
 
   int maxDestSize = LZ4_COMPRESSBOUND(source_size);
-  if (maxDestSize) {
+  if (likely(maxDestSize)) {
     mrb_value dest = mrb_str_new(mrb, NULL, maxDestSize);
     int destSize = LZ4_compress_default(source, RSTRING_PTR(dest), source_size, maxDestSize);
-    if (destSize)
+    if (likely(destSize))
       return mrb_str_resize(mrb, dest, destSize);
     else
       mrb_raise(mrb, E_LZ4_ERROR, "cannot compress");
@@ -31,16 +41,16 @@ mrb_LZ4_decompress_safe(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "si", &source, &compressedSize, &maxDecompressedSize);
 
-  if (maxDecompressedSize < 0)
+  if (unlikely(maxDecompressedSize < 0))
     mrb_raise(mrb, E_ARGUMENT_ERROR, "maxDecompressedSize mustn't be negative");
 
   mrb_value dest = mrb_str_new(mrb, NULL, maxDecompressedSize);
 
-  int err = LZ4_decompress_safe(source, RSTRING_PTR(dest), compressedSize, maxDecompressedSize);
-  if (err < 0)
-    mrb_raise(mrb, E_LZ4_ERROR, "cannot decompress, source may be malformed or maxDecompressedSize is too small");
+  int decompressedSize = LZ4_decompress_safe(source, RSTRING_PTR(dest), compressedSize, maxDecompressedSize);
+  if (decompressedSize >= 0)
+    return mrb_str_resize(mrb, dest, decompressedSize);
   else
-    return mrb_str_resize(mrb, dest, err);
+    mrb_raise(mrb, E_LZ4_ERROR, "cannot decompress, source may be malformed or maxDecompressedSize is too small");
 }
 
 
