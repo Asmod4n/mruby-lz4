@@ -2,15 +2,13 @@
 #include "lz4.h"
 #include <mruby/string.h>
 
-/* LZ4_GCC_VERSION is defined into lz4.h */
-#if (LZ4_GCC_VERSION >= 302) || (__INTEL_COMPILER >= 800) || defined(__clang__)
-#  define expect(expr,value)    (__builtin_expect ((expr),(value)) )
+#if (__GNUC__ >= 3) || (__INTEL_COMPILER >= 800) || defined(__clang__)
+# define likely(x) __builtin_expect(!!(x), 1)
+# define unlikely(x) __builtin_expect(!!(x), 0)
 #else
-#  define expect(expr,value)    (expr)
+# define likely(x) (x)
+# define unlikely(x) (x)
 #endif
-
-#define likely(expr)     expect((expr) != 0, 1)
-#define unlikely(expr)   expect((expr) != 0, 0)
 
 static mrb_value
 mrb_LZ4_compress_default(mrb_state *mrb, mrb_value self)
