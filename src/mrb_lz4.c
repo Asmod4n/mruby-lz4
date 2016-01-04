@@ -20,15 +20,16 @@ mrb_LZ4_compress_default(mrb_state *mrb, mrb_value self)
 
   int maxDestSize = LZ4_COMPRESSBOUND(source_size);
   if (likely(maxDestSize)) {
-    mrb_value dest = mrb_str_new(mrb, NULL, maxDestSize);
-    int destSize = LZ4_compress_default(source, RSTRING_PTR(dest), source_size, maxDestSize);
-    if (likely(destSize))
+    mrb_value dest = mrb_str_buf_new(mrb, maxDestSize);
+    int destSize = LZ4_compress_default(source, RSTRING_PTR(dest), source_size, RSTRING_CAPA(dest));
+    if (likely(destSize)) {
       return mrb_str_resize(mrb, dest, destSize);
-    else
+    } else {
       mrb_raise(mrb, E_LZ4_ERROR, "cannot compress");
-  }
-  else
+    }
+  } else {
     mrb_raise(mrb, E_ARGUMENT_ERROR, "source_size is too large");
+  }
 }
 
 static mrb_value
@@ -39,16 +40,18 @@ mrb_LZ4_decompress_safe(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "si", &source, &compressedSize, &maxDecompressedSize);
 
-  if (unlikely(maxDecompressedSize < 0))
+  if (unlikely(maxDecompressedSize < 0)) {
     mrb_raise(mrb, E_ARGUMENT_ERROR, "maxDecompressedSize mustn't be negative");
+  }
 
-  mrb_value dest = mrb_str_new(mrb, NULL, maxDecompressedSize);
+  mrb_value dest = mrb_str_buf_new(mrb, maxDecompressedSize);
 
-  int decompressedSize = LZ4_decompress_safe(source, RSTRING_PTR(dest), compressedSize, maxDecompressedSize);
-  if (decompressedSize >= 0)
+  int decompressedSize = LZ4_decompress_safe(source, RSTRING_PTR(dest), compressedSize, RSTRING_CAPA(dest));
+  if (decompressedSize >= 0) {
     return mrb_str_resize(mrb, dest, decompressedSize);
-  else
+  } else {
     mrb_raise(mrb, E_LZ4_ERROR, "cannot decompress, source may be malformed or maxDecompressedSize is too small");
+  }
 }
 
 

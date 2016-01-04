@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#define E_LZ4_ERROR mrb_class_get_under(mrb, mrb_module_get(mrb, "LZ4"), "Error")
+#define E_LZ4_ERROR (mrb_class_get_under(mrb, mrb_module_get(mrb, "LZ4"), "Error"))
 
 #ifdef __cplusplus
 }
