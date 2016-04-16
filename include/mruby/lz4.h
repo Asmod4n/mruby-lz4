@@ -1,4 +1,4 @@
-﻿#ifndef MRUBY_LZ4_H
+#ifndef MRUBY_LZ4_H
 #define MRUBY_LZ4_H
 
 #include <mruby.h>

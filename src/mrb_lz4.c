@@ -1,4 +1,4 @@
-﻿#include "mruby/lz4.h"
+#include "mruby/lz4.h"
 #include "lz4.h"
 #include <mruby/string.h>
 
@@ -54,7 +54,6 @@ mrb_LZ4_decompress_safe(mrb_state *mrb, mrb_value self)
   }
 }
 
-
 void
 mrb_mruby_lz4_gem_init(mrb_state* mrb) {
   struct RClass *LZ4_mod;
@@ -65,6 +64,4 @@ mrb_mruby_lz4_gem_init(mrb_state* mrb) {
   mrb_define_module_function(mrb, LZ4_mod, "decompress_safe", mrb_LZ4_decompress_safe, MRB_ARGS_REQ(2));
 }
 
-void
-mrb_mruby_lz4_gem_final(mrb_state* mrb) {
-}
+void mrb_mruby_lz4_gem_final(mrb_state* mrb) { }
