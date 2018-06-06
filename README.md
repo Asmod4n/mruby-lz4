@@ -15,7 +15,7 @@ LZ4.decompress(compressed, text.bytesize) == text
 
 LICENSE
 =======
-Copyright 2015 Hendrik Beskow
+Copyright 2015
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this Project except in compliance with the License.
